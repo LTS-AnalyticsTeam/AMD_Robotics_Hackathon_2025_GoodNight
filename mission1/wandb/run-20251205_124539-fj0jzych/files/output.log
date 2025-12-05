@@ -1,0 +1,52 @@
+INFO 2025-12-05 12:45:40 db_utils.py:102 [1m[34mLogs will be synced with wandb.[0m
+INFO 2025-12-05 12:45:40 db_utils.py:103 Track this run --> [1m[33mhttps://wandb.ai/lts-robotics-team/lerobot/runs/fj0jzych[0m
+INFO 2025-12-05 12:45:40 ot_train.py:183 Creating dataset
+stats.json: 9.92kB [00:00, 12.5MB/s]                      | 0/4 [00:00<?, ?it/s]
+info.json: 2.60kB [00:00, 9.92MB/s]
+meta/tasks.parquet: 100%|██████████████████| 2.25k/2.25k [00:00<00:00, 5.30kB/s]
+meta/episodes/chunk-000/file-000.parquet: 100%|█| 55.9k/55.9k [00:00<00:00, 106k
+Fetching 4 files: 100%|███████████████████████████| 4/4 [00:00<00:00,  5.90it/s]
+README.md: 3.08kB [00:00, 13.7MB/s]                       | 0/8 [00:00<?, ?it/s]
+.gitattributes: 2.46kB [00:00, 14.9MB/s]             | 0.00/156k [00:00<?, ?B/s]
+data/chunk-000/file-000.parquet: 100%|███████| 156k/156k [00:00<00:00, 1.63MB/s]
+videos/observation.images.wrist/chunk-00(…): 100%|█| 57.6M/57.6M [00:00<00:00, 7
+Fetching 8 files: 100%|███████████████████████████| 8/8 [00:00<00:00,  8.74it/s]
+INFO 2025-12-05 12:45:42 ot_train.py:202 Creating policy6M/57.6M [00:00<00:00, 7
+config.json: 3.77kB [00:00, 28.7MB/s]
+processor_config.json: 100%|██████████████████| 67.0/67.0 [00:00<00:00, 593kB/s]
+chat_template.json: 100%|██████████████████████| 430/430 [00:00<00:00, 4.80MB/s]
+preprocessor_config.json: 100%|████████████████| 599/599 [00:00<00:00, 5.67MB/s]
+tokenizer_config.json: 28.6kB [00:00, 48.3MB/s]
+vocab.json: 801kB [00:00, 8.04MB/s]
+merges.txt: 466kB [00:00, 13.5MB/s]
+tokenizer.json: 3.55MB [00:00, 17.7MB/s]
+added_tokens.json: 4.74kB [00:00, 34.8MB/s]
+special_tokens_map.json: 100%|█████████████████| 868/868 [00:00<00:00, 8.90MB/s]
+Reducing the number of VLM layers to 16 ...
+INFO 2025-12-05 12:45:59 ot_train.py:247 Creating optimizer and scheduler
+INFO 2025-12-05 12:45:59 hedulers.py:105 Auto-scaling LR scheduler: num_training_steps (1000) < num_decay_steps (30000). Scaling warmup: 1000 → 33, decay: 30000 → 1000 (scale factor: 0.033)
+INFO 2025-12-05 12:45:59 ot_train.py:259 [1m[33mOutput dir:[0m outputs/train/mission1_smolvla
+INFO 2025-12-05 12:45:59 ot_train.py:262 cfg.steps=1000 (1K)
+INFO 2025-12-05 12:45:59 ot_train.py:263 dataset.num_frames=3187 (3K)
+INFO 2025-12-05 12:45:59 ot_train.py:264 dataset.num_episodes=10
+INFO 2025-12-05 12:45:59 ot_train.py:267 Effective batch size: 64 x 1 = 64
+INFO 2025-12-05 12:45:59 ot_train.py:268 num_learnable_params=99880992 (100M)
+INFO 2025-12-05 12:45:59 ot_train.py:269 num_total_params=450046176 (450M)
+INFO 2025-12-05 12:45:59 ot_train.py:324 Start offline training on a fixed dataset
+INFO 2025-12-05 12:47:35 ot_train.py:351 step:200 smpl:13K ep:40 epch:4.02 loss:0.406 grdn:2.640 lr:8.9e-05 updt_s:0.414 data_s:0.067
+WARNING 2025-12-05 12:47:35 db_utils.py:141 WandB logging of key "losses_after_forward" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+WARNING 2025-12-05 12:47:35 db_utils.py:141 WandB logging of key "losses_after_rm_padding" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+INFO 2025-12-05 12:48:51 ot_train.py:351 step:400 smpl:26K ep:80 epch:8.03 loss:0.123 grdn:1.737 lr:7.9e-05 updt_s:0.294 data_s:0.085
+WARNING 2025-12-05 12:48:51 db_utils.py:141 WandB logging of key "losses_after_forward" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+WARNING 2025-12-05 12:48:51 db_utils.py:141 WandB logging of key "losses_after_rm_padding" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+INFO 2025-12-05 12:50:06 ot_train.py:351 step:600 smpl:38K ep:120 epch:12.05 loss:0.096 grdn:1.267 lr:5.1e-05 updt_s:0.291 data_s:0.080
+WARNING 2025-12-05 12:50:06 db_utils.py:141 WandB logging of key "losses_after_forward" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+WARNING 2025-12-05 12:50:06 db_utils.py:141 WandB logging of key "losses_after_rm_padding" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+INFO 2025-12-05 12:51:21 ot_train.py:351 step:800 smpl:51K ep:161 epch:16.07 loss:0.081 grdn:0.887 lr:2.3e-05 updt_s:0.291 data_s:0.082
+WARNING 2025-12-05 12:51:21 db_utils.py:141 WandB logging of key "losses_after_forward" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+WARNING 2025-12-05 12:51:21 db_utils.py:141 WandB logging of key "losses_after_rm_padding" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+INFO 2025-12-05 12:52:35 ot_train.py:351 step:1K smpl:64K ep:201 epch:20.08 loss:0.077 grdn:0.637 lr:5.6e-06 updt_s:0.291 data_s:0.081
+WARNING 2025-12-05 12:52:35 db_utils.py:141 WandB logging of key "losses_after_forward" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+WARNING 2025-12-05 12:52:35 db_utils.py:141 WandB logging of key "losses_after_rm_padding" was ignored as its type "<class 'torch.Tensor'>" is not handled by this wrapper.
+INFO 2025-12-05 12:52:35 ot_train.py:361 Checkpoint policy after step 1000
+INFO 2025-12-05 12:52:39 ot_train.py:430 End of training
