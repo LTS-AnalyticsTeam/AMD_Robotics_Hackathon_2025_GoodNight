@@ -3,7 +3,8 @@
 """ローカル定義の image_transforms を lerobot-train に差し込むラッパー。
 
 標準の `lerobot-train` CLI と同じ引数を受け取り、データセット生成だけを
-`processors.image_transforms` に置き換える。サブモジュール側には手を入れない。
+`processors.image_transforms` に置き換える。LeRobot 本体に拡張を統合したため、
+ここではそれらを呼び出す薄いラッパーとして振る舞う。
 """
 
 from typing import Any, Sequence

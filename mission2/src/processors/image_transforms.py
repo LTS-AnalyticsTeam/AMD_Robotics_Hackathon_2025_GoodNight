@@ -1,81 +1,89 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""軽量な画像データ拡張ヘルパー
+"""LeRobot 本体の ImageTransforms に委譲するラッパー。
 
-学習用と評価用で使い分ける torchvision.transforms.v2 ベースの変換定義。
-LeRobotDataset にそのまま渡せる Callable を返す。
+ローカル実装をやめ、サブモジュール側の設定可能な Transform を再利用することで
+実装の重複を避ける。
 """
 
 from collections.abc import Sequence
 from typing import Any
 
-import torch
-from torchvision.transforms import v2
+from lerobot.datasets.transforms import ImageTransformConfig, ImageTransforms, ImageTransformsConfig
+
+
+def _build_config(enable_augmentation: bool, image_size: Sequence[int]) -> ImageTransformsConfig:
+    """ローカル利用向けの ImageTransformsConfig を生成する。
+
+    Args:
+        enable_augmentation (bool): 拡張を有効にするか。
+        image_size (Sequence[int]): (height, width) で指定する出力解像度。
+
+    Returns:
+        ImageTransformsConfig: LeRobot 互換の画像変換設定。
+
+    Raises:
+        ValueError: ``image_size`` の長さが 2 でない場合。
+    """
+    if len(image_size) != 2:
+        raise ValueError("image_size は (height, width) の 2 要素で指定してください。")
+
+    return ImageTransformsConfig(
+        enable=enable_augmentation,
+        output_size=tuple(image_size),
+        apply_random_subset=False,
+        tfs={
+            "color_jitter": ImageTransformConfig(
+                weight=1.0,
+                type="ColorJitter",
+                kwargs={"brightness": 0.1, "contrast": 0.1, "saturation": 0.1, "hue": 0.02},
+            ),
+            "random_affine": ImageTransformConfig(
+                weight=1.0,
+                type="RandomAffine",
+                kwargs={"degrees": 3, "translate": (0.03, 0.03), "scale": (0.98, 1.02)},
+            ),
+            "gaussian_blur": ImageTransformConfig(
+                weight=1.0,
+                type="GaussianBlur",
+                kwargs={"kernel_size": 3, "sigma": (0.1, 1.0)},
+            ),
+            "random_erasing": ImageTransformConfig(
+                weight=1.0,
+                type="RandomErasing",
+                kwargs={"p": 0.2, "scale": (0.02, 0.05), "ratio": (0.3, 3.3)},
+            ),
+        },
+    )
 
 
 def make_train_image_transforms(
     enable_augmentation: bool = True, image_size: Sequence[int] = (256, 256)
-) -> v2.Compose:
+) -> ImageTransforms:
     """学習用の画像変換パイプラインを生成する。
-
-    リサイズと dtype 変換の後に、ColorJitter / RandomAffine / GaussianBlur /
-    RandomErasing を適用する。``enable_augmentation`` が False の場合は、
-    拡張を省いて最小限の前処理のみを返す。
 
     Args:
         enable_augmentation (bool): True の場合はデータ拡張を有効化する。
         image_size (Sequence[int]): (height, width) で指定する出力解像度。
 
     Returns:
-        v2.Compose: LeRobotDataset に渡せる torchvision v2 の Compose オブジェクト。
-
-    Raises:
-        ValueError: ``image_size`` の長さが 2 でない場合。
+        ImageTransforms: LeRobotDataset に渡せる Transform オブジェクト。
     """
-    if len(image_size) != 2:
-        raise ValueError("image_size は (height, width) の 2 要素で指定してください。")
-
-    base_transforms: list[Any] = [
-        v2.Resize(image_size, antialias=True),
-        v2.ToDtype(torch.float32, scale=True),
-    ]
-
-    if not enable_augmentation:
-        return v2.Compose(base_transforms)
-
-    augmentation_transforms: list[Any] = [
-        v2.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02),
-        v2.RandomAffine(degrees=3, translate=(0.03, 0.03), scale=(0.98, 1.02)),
-        v2.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0)),
-        v2.RandomErasing(p=0.2, scale=(0.02, 0.05), ratio=(0.3, 3.3)),
-    ]
-
-    return v2.Compose(base_transforms + augmentation_transforms)
+    cfg = _build_config(enable_augmentation, image_size)
+    return ImageTransforms(cfg)
 
 
-def make_eval_image_transforms(image_size: Sequence[int] = (256, 256)) -> v2.Compose:
+def make_eval_image_transforms(image_size: Sequence[int] = (256, 256)) -> ImageTransforms:
     """評価・推論用の最小前処理を生成する。
-
-    リサイズと ToDtype (scale=True) のみを適用する。
 
     Args:
         image_size (Sequence[int]): (height, width) で指定する出力解像度。
 
     Returns:
-        v2.Compose: 評価用の torchvision v2 Compose オブジェクト。
-
-    Raises:
-        ValueError: ``image_size`` の長さが 2 でない場合。
+        ImageTransforms: 評価用 Transform オブジェクト（リサイズと ToDtype のみ）。
     """
-    if len(image_size) != 2:
-        raise ValueError("image_size は (height, width) の 2 要素で指定してください。")
-
-    return v2.Compose(
-        [
-            v2.Resize(image_size, antialias=True),
-            v2.ToDtype(torch.float32, scale=True),
-        ]
-    )
+    cfg = _build_config(enable_augmentation=False, image_size=image_size)
+    return ImageTransforms(cfg)
 
 
 def make_lerobot_dataset(
@@ -100,11 +108,7 @@ def make_lerobot_dataset(
     """
     from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
-    if train:
-        image_transforms = make_train_image_transforms(
-            enable_augmentation=enable_augmentation, image_size=image_size
-        )
-    else:
-        image_transforms = make_eval_image_transforms(image_size=image_size)
+    cfg = _build_config(enable_augmentation if train else False, image_size)
+    image_transforms = ImageTransforms(cfg)
 
     return LeRobotDataset(repo_id=repo_id, image_transforms=image_transforms, **dataset_kwargs)

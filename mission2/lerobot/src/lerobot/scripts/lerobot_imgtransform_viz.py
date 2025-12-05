@@ -83,7 +83,17 @@ def save_each_transform(cfg: ImageTransformsConfig, original_frame, output_dir, 
         tf_cfg_kwgs_max = deepcopy(tf_cfg.kwargs)
         tf_cfg_kwgs_avg = deepcopy(tf_cfg.kwargs)
 
-        for key, (min_, max_) in tf_cfg.kwargs.items():
+        for key, val in tf_cfg.kwargs.items():
+            if isinstance(val, (int, float)):
+                min_, max_ = val, val
+            elif isinstance(val, (list, tuple)) and len(val) == 2 and all(
+                isinstance(v, (int, float)) for v in val
+            ):
+                min_, max_ = val
+            else:
+                # Skip non-numeric or nested kwargs (e.g. translate)
+                continue
+
             avg = (min_ + max_) / 2
             tf_cfg_kwgs_min[key] = [min_, min_]
             tf_cfg_kwgs_max[key] = [max_, max_]
