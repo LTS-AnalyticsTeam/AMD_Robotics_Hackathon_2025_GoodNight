@@ -84,16 +84,16 @@ lerobot-train \
   --policy.optimizer_weight_decay=0.01 \
   --policy.optimizer_betas='[0.9,0.95]' \
   --policy.optimizer_grad_clip_norm=1.0 \
-  --policy.scheduler_warmup_steps=300 \
-  --policy.scheduler_decay_steps=8000 \
+  --policy.scheduler_warmup_steps=600 \
+  --policy.scheduler_decay_steps=11500 \
   --policy.scheduler_decay_lr=1e-6 \
   --batch_size=32 \
-  --steps=1000 \
+  --steps=16500 \
   --save_freq=2000 \
   --log_freq=100 \
   --policy.device=cuda \
-  --output_dir=outputs/train/mission2_smolvla_003_test \
-  --job_name=mission2_smolvla_003_test \
+  --output_dir=outputs/train/mission2_smolvla_003 \
+  --job_name=mission2_smolvla_003 \
   --wandb.enable=true \
   --dataset.video_backend=pyav \
   --policy.push_to_hub=false
@@ -128,7 +128,28 @@ lerobot-train \
   --rename_map='{"observation.images.front":"observation.images.base_0_rgb","observation.images.above":"observation.images.left_wrist_0_rgb"}'
 ```
 
-<<<<<<< HEAD
+## act_001
+```bash
+lerobot-train \
+  --policy.type=act \
+  --dataset.repo_id=lt-s/AMD_hackathon2025_merged_blanket \
+  --policy.output_features='{"action":{"type":"ACTION","shape":[12]}}' \
+  --policy.input_features='{"observation.state":{"type":"STATE","shape":[12]}, "observation.images.front":{"type":"VISUAL","shape":[3,256,256]}, "observation.images.above":{"type":"VISUAL","shape":[3,256,256]}}' \
+  --policy.normalization_mapping='{"VISUAL":"IDENTITY","STATE":"MEAN_STD","ACTION":"MEAN_STD"}' \
+  --policy.optimizer_lr=1e-4 \
+  --policy.optimizer_weight_decay=0.01 \
+  --batch_size=32 \
+  --steps=6000 \
+  --save_freq=1000 \
+  --log_freq=100 \
+  --policy.device=cuda \
+  --output_dir=outputs/train/mission2_act_001 \
+  --job_name=mission2_act_001 \
+  --wandb.enable=true \
+  --dataset.video_backend=pyav \
+  --policy.push_to_hub=false
+```
+
 # データセットのマージ
 ```bash
 lerobot-edit-dataset \
@@ -165,7 +186,6 @@ lerobot-edit-dataset \
    ls ~/.cache/huggingface/lerobot/lt-s/AMD_hackathon2025_merged_blanket/meta
    ```
 ```
-=======
 ## pi05_002
 ```bash
 lerobot-train \
@@ -196,4 +216,3 @@ lerobot-train \
   --policy.push_to_hub=false \
   --rename_map='{"observation.images.front":"observation.images.base_0_rgb","observation.images.above":"observation.images.left_wrist_0_rgb"}'
 ```
->>>>>>> b56d46cc781ca6d60615211df9727bedb9e176a7
