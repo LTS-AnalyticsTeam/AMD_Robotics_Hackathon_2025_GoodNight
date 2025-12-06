@@ -14,7 +14,7 @@ This team is made up of members from LTS, Inc.
 This robot gently tucks a blanket over a plush toy or a person using its two arms.
 It can place, adjust, and smooth the blanket to provide comfort and warmth on a cold night.
 Through this project, we aim to bring a sense of kindness and emotional warmth to machines that are often perceived as mechanical and impersonal.
-![alt text](image.png)
+![alt text](./media/img/image.png)
 
 ### Problems We Aim to Solve
 Rather than focusing solely on functional automation, this product explores how robots can offer emotional support and enhance everyday life. It addresses several real-world needs:
