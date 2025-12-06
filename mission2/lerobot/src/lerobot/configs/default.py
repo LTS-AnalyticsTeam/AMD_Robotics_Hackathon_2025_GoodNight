@@ -38,6 +38,19 @@ class DatasetConfig:
 
 
 @dataclass
+class TensorBoardConfig:
+    """TensorBoard 用の設定を保持するデータクラス。
+
+    Attributes:
+        enable (bool): TensorBoard ログを有効にするかどうか。
+        log_dir (str | None): ログ出力先を明示的に指定するパス。
+    """
+
+    enable: bool = False
+    log_dir: str | None = None
+
+
+@dataclass
 class WandBConfig:
     enable: bool = False
     # Set to true to disable saving an artifact despite training.save_checkpoint=True
