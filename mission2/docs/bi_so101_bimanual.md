@@ -73,6 +73,7 @@ lerobot-record \
 ```
 
 ## 推論
+### smolvla
 ```bash
 lerobot-record \
   --robot.type=bi_so101_follower \
@@ -85,7 +86,22 @@ lerobot-record \
   --dataset.num_episodes=50 \
   --dataset.episode_time_s=50 \
   --dataset.push_to_hub=false \
-  --policy.path=lt-s/AMD_hackathon2025_mission2_smolvla_008000
+  --policy.path=lt-s/AMD_hackathon2025_blanket_smolvla_006000
+```
+### pi05
+```bash
+lerobot-record \
+  --robot.type=bi_so101_follower \
+  --robot.left_arm_port=/dev/ttyACM2 \
+  --robot.right_arm_port=/dev/ttyACM3 \
+  --robot.id=bi_so101_follower \
+  --robot.cameras='{base_0_rgb: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30}, left_wrist_0_rgb: {"type": "opencv", "index_or_path": 6, "width": 640, "height": 480, "fps": 30, "fourcc":"MJPG", "warmup_s":2}}' \
+  --dataset.repo_id=lt-s/eval_AMD_hackathon_place_blanket \
+  --dataset.single_task="Grab the red grip to unfold the blanket, then gently place the blanket over the doll." \
+  --dataset.num_episodes=50 \
+  --dataset.episode_time_s=50 \
+  --dataset.push_to_hub=false \
+  --policy.path=lt-s/AMD_hackathon2025_blanket_pi05_006000
 ```
 
 ## 安全メモ
