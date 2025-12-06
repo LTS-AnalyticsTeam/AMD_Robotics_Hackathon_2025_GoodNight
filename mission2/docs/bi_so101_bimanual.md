@@ -23,13 +23,13 @@ pip install -e .             # 本リポの両腕プラグインを導入
 ```bash
 lerobot-teleoperate \
   --teleop.type=bi_so101_leader \
-  --teleop.left_arm_port=/dev/ttyUSB_leader_L \
-  --teleop.right_arm_port=/dev/ttyUSB_leader_R \
-  --teleop.id=my_biso101_leader \
+  --teleop.left_arm_port=/dev/ttyACM0 \
+  --teleop.right_arm_port=/dev/ttyACM1 \
+  --teleop.id=bi_so101_leader \
   --robot.type=bi_so101_follower \
-  --robot.left_arm_port=/dev/ttyUSB_follower_L \
-  --robot.right_arm_port=/dev/ttyUSB_follower_R \
-  --robot.id=my_biso101_follower \
+  --robot.left_arm_port=/dev/ttyACM2 \
+  --robot.right_arm_port=/dev/ttyACM3 \
+  --robot.id=bi_so101_follower \
   --fps=30
 ```
 - 角度モードを使いたい場合:
@@ -38,6 +38,7 @@ lerobot-teleoperate \
 - カメラを使う場合は通常どおり `--robot.cameras.cam0.width ...` などを付与。
 
 ## レコーディング
+### ブランケットをかける
 ```bash
 lerobot-record \
   --teleop.type=bi_so101_leader \
@@ -48,10 +49,27 @@ lerobot-record \
   --robot.left_arm_port=/dev/ttyACM2 \
   --robot.right_arm_port=/dev/ttyACM3 \
   --robot.id=bi_so101_follower \
-  --robot.cameras='{front: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30},}' \
-  --dataset.repo_id=lt-s/bi-so101-demo \
-  --dataset.single_task="Pick-and-place bimanual demo" \
-  --dataset.num_episodes=3
+  --robot.cameras='{front: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30}, above: {"type": "opencv", "index_or_path": 6, "width": 640, "height": 480, "fps": 30, "fourcc":"MJPG", "warmup_s":2}}' \
+  --dataset.repo_id=lt-s/AMD_hackathon_place_blanket \
+  --dataset.single_task="Grab the red grip to unfold the blanket, then gently place the blanket over the doll." \
+  --dataset.num_episodes=50
+```
+### ブランケットをめくる
+```bash
+lerobot-record \
+  --teleop.type=bi_so101_leader \
+  --teleop.left_arm_port=/dev/ttyACM0 \
+  --teleop.right_arm_port=/dev/ttyACM1 \
+  --teleop.id=bi_so101_leader \
+  --robot.type=bi_so101_follower \
+  --robot.left_arm_port=/dev/ttyACM2 \
+  --robot.right_arm_port=/dev/ttyACM3 \
+  --robot.id=bi_so101_follower \
+  --robot.cameras='{front: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30}, above: {"type": "opencv", "index_or_path": 6, "width": 640, "height": 480, "fps": 30, "fourcc":"MJPG", "warmup_s":2}}' \
+  --dataset.repo_id=lt-s/AMD_hackathon_lift_blanket \
+  --dataset.single_task="Grab the red loop and gently lift the blanket up, then fold it in thirds and place it at the doll's feet." \
+  --dataset.num_episodes=50 \
+  --dataset.push_to_hub=false
 ```
 
 ## 安全メモ
