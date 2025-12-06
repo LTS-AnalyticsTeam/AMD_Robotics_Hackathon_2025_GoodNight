@@ -40,3 +40,9 @@ By addressing these challenges, we explore how robots can perform delicate tasks
 ### Bi manual
 For Bi Manual operation, please refer to the following document.
 - `mission2/docs/bi_so101_bimanual.md`
+
+## Demo Video
+The following video shows a successful blanket-tucking action on a doll.
+
+<video controls src="./media/video/blanket-placement-success-1.mov" width="640"></video>
+<video controls src="./media/video/blanket-placement-success-2.mov" width="640"></video>
