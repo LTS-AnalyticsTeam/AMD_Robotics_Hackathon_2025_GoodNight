@@ -43,5 +43,8 @@ For Bi Manual operation, please refer to the following document.
 
 ## Demo Video
 The following video shows a successful blanket-tucking action on a doll.
-https://github.com/user-attachments/assets/530a4eb0-7ea9-46ab-bcbd-f9e5db75d51b
+
+
+https://github.com/user-attachments/assets/22517c3b-e972-49ee-a0ac-ce98cedb2a9b
+
 [another videos](media/video)
