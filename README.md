@@ -41,6 +41,8 @@ These components collectively highlight a new direction in home robotics: robots
 ### 3. Technical Implementations
 
 #### Teleoperation / Dataset Capture
+To reliably manipulate a highly deformable blanket, we refined both the task setup and the way the arms are operated during teleoperation.  
+After grasping, we carefully adjusted lift direction, arm posture, and motion speed so that the blanket would not slip or fall, avoiding unnecessary tension or twisting of the material.
 We developed a custom bi-manual teleoperation environment where two SO-101 arms can be jointly controlled and recorded as a single synchronized dataset.  
 Through repeated practice and refinement, we collected nearly 500 high-quality episodes.  
 To improve data quality, we performed trimming, filtering, and refinement of teleoperation trajectories before training.
