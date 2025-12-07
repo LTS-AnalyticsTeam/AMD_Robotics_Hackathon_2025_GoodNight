@@ -23,18 +23,19 @@ Our mission explores how robots can provide not only functional assistance but a
 While conventional home robots focus on efficiency and automation, our approach aims to introduce warmth, empathy, and gentleness into human–robot interaction.
 
 This project tackles several real-world challenges:
-• Providing a comforting presence for people who sleep alone  
-• Maintaining a pleasant sleeping environment through gentle blanket adjustments  
-• Supporting children, elderly individuals, or anyone who has difficulty handling bedding independently  
+- Providing a comforting presence for people who sleep alone  
+- Maintaining a pleasant sleeping environment through gentle blanket adjustments  
+- Supporting children, elderly individuals, or anyone who has difficulty handling bedding independently  
 
 The goal is not merely to manipulate a blanket, but to demonstrate how robots can contribute to human well-being by performing delicate, caring actions.
 
 ### 2. Creativity
 Our work introduces several novel aspects:
-• A bi-manual coordination strategy using two SO-101 arms to lift, spread, and place a blanket with gentle and expressive motion  
-• A design concept emphasizing emotional support rather than pure task performance  
-• Motion profiles and policy tuning aimed at expressing softness, care, and non-intrusiveness  
-• A GUI-based interaction system that allows users to trigger high-level commands such as “Good night”, “Good morning”, and “Too warm”  
+- A bi-manual coordination strategy using two SO-101 arms to lift, spread, and place a blanket with gentle and expressive motion  
+- A design concept emphasizing emotional support rather than pure task performance  
+- Motion profiles and policy tuning aimed at expressing softness, care, and non-intrusiveness  
+- A GUI-based interaction system that allows users to trigger high-level commands such as “Good night”, “Good morning”, and “Too warm”
+
 These components collectively highlight a new direction in home robotics: robots that feel emotionally considerate while remaining technically robust.
 
 ### 3. Technical Implementations
@@ -51,23 +52,23 @@ We experimented with different learning rates, action chunk sizes, and dataset c
 #### Hardware Configuration
 We built a dual-arm setup using two SO-101 units with synchronized control.  
 This setup allows:  
-• Simultaneous bi-manual teleoperation  
-• Unified synchronized dataset recording  
-• Paired policy inference for both arms  
+- Simultaneous bi-manual teleoperation  
+- Unified synchronized dataset recording  
+- Paired policy inference for both arms  
 
 #### GUI Application
 We implemented an interactive GUI that enables high-level, user-friendly commands:
-• Good night – the robot gently places a blanket  
-• Good morning – the robot carefully pulls the blanket away  
-• Too warm – the blanket is lowered to the user's waist  
+- Good night – the robot gently places a blanket  
+- Good morning – the robot carefully pulls the blanket away  
+- Too warm – the blanket is lowered to the user's waist  
 This interface reduces operational complexity and enhances usability for non-expert users.
 
 ### 4. Ease of Use
 Our system is designed with practical deployment and extensibility in mind:
-• The bi-manual framework can generalize to other dual-arm tasks, such as folding, organizing, or coordinated object manipulation  
-• The teleoperation interface and dataset pipeline support rapid collection of new demonstrations for other domains  
-• The GUI enables intuitive control, hiding low-level robot details and providing simple, understandable commands  
-• The overall architecture is modular, allowing teams to adapt the approach to different environments, tasks, or robot platforms  
+- The bi-manual framework can generalize to other dual-arm tasks, such as folding, organizing, or coordinated object manipulation  
+- The teleoperation interface and dataset pipeline support rapid collection of new demonstrations for other domains  
+- The GUI enables intuitive control, hiding low-level robot details and providing simple, understandable commands  
+- The overall architecture is modular, allowing teams to adapt the approach to different environments, tasks, or robot platforms  
 
 The result is a flexible, user-friendly system that balances creativity, technical rigor, and real-world applicability.
 
