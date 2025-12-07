@@ -64,6 +64,8 @@ We implemented an interactive GUI that enables high-level, user-friendly command
 - Good morning – the robot carefully pulls the blanket away
 This interface reduces operational complexity and enhances usability for non-expert users.
 
+![alt text](./media/img/app.jpg)
+
 ### 4. Ease of Use
 Our system is designed with practical deployment and extensibility in mind:
 - The bi-manual framework can generalize to other dual-arm tasks, such as folding, organizing, or coordinated object manipulation  
