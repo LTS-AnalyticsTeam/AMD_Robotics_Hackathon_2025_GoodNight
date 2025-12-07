@@ -204,6 +204,7 @@ def _start_inference(config: RobotInferenceConfig) -> None:
                 push_to_hub=config.push_to_hub,
                 save_dataset=config.save_dataset,
                 meta_repo_id=config.meta_repo_id,
+                stop_event=stop_event,
             )
         except Exception as e:
             st.error(f"推論中にエラーが発生しました: {e}")
@@ -229,15 +230,26 @@ def _stop_inference() -> None:
 
     """
 
+    if not st.session_state.inference_running:
+        st.info("推論は実行されていません。")
+        return
+
     stop_event: Optional[threading.Event] = st.session_state.inference_stop_event
     inference_thread: Optional[threading.Thread] = st.session_state.inference_thread
+    
     if stop_event is not None:
         stop_event.set()
+        st.info("停止シグナルを送信しました。ロボットが安全に停止するまでお待ちください...")
+    
     if inference_thread is not None and inference_thread.is_alive():
-        inference_thread.join(timeout=5)
+        inference_thread.join(timeout=10)
+        if inference_thread.is_alive():
+            st.warning("推論スレッドが10秒以内に停止しませんでした。強制終了します。")
+    
     st.session_state.inference_stop_event = None
     st.session_state.inference_thread = None
     st.session_state.inference_running = False
+    st.success("推論を停止しました。")
 
 
 def main() -> None:
