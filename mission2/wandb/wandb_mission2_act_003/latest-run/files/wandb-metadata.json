@@ -1,0 +1,58 @@
+{
+  "os":  "Linux-6.1.0-39-amd64-x86_64-with-glibc2.39",
+  "python":  "CPython 3.10.19",
+  "startedAt":  "2025-12-06T22:49:04.495046Z",
+  "args":  [
+    "--policy.type=act",
+    "--dataset.repo_id=lt-s/AMD_hackathon_drape_blanket",
+    "--policy.output_features={\"action\":{\"type\":\"ACTION\",\"shape\":[12]}}",
+    "--policy.input_features={\"observation.state\":{\"type\":\"STATE\",\"shape\":[12]}, \"observation.images.front\":{\"type\":\"VISUAL\",\"shape\":[3,256,256]}, \"observation.images.above\":{\"type\":\"VISUAL\",\"shape\":[3,256,256]}}",
+    "--policy.normalization_mapping={\"VISUAL\":\"IDENTITY\",\"STATE\":\"MEAN_STD\",\"ACTION\":\"MEAN_STD\"}",
+    "--policy.optimizer_lr=1e-4",
+    "--policy.optimizer_weight_decay=0.01",
+    "--batch_size=64",
+    "--steps=6000",
+    "--save_freq=1000",
+    "--log_freq=100",
+    "--policy.device=cuda",
+    "--output_dir=outputs/train/mission2_act_003",
+    "--job_name=mission2_act_003",
+    "--wandb.enable=true",
+    "--tensorboard.enable=true",
+    "--dataset.video_backend=pyav",
+    "--policy.push_to_hub=false"
+  ],
+  "program":  "/root/miniconda3/envs/lerobot-pi05/bin/lerobot-train",
+  "root":  "outputs/train/mission2_act_003",
+  "host":  "robotics-jupyter-launcher-3958",
+  "executable":  "/root/miniconda3/envs/lerobot-pi05/bin/python3.10",
+  "cpu_count":  160,
+  "cpu_count_logical":  160,
+  "gpu":  "AMD Instinct MI300X VF",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "2162185003008",
+      "used":  "1124043878400"
+    }
+  },
+  "memory":  {
+    "total":  "2029207171072"
+  },
+  "gpu_amd":  [
+    {
+      "id":  "0",
+      "uniqueId":  "0x257b923d7129db22",
+      "vbiosVersion":  "113-M3000100-103",
+      "performanceLevel":  "auto",
+      "maxPower":  "750.0",
+      "series":  "AMD Instinct MI300X VF",
+      "model":  "0x74b5",
+      "vendor":  "Advanced Micro Devices, Inc. [AMD/ATI]",
+      "sku":  "M3000100",
+      "sclkRange":  "500Mhz - 2100Mhz",
+      "mclkRange":  "900Mhz - 1300Mhz"
+    }
+  ],
+  "writerId":  "jtegrss5rfgkcwdilyzx4wxi2y5ft06v"
+}
