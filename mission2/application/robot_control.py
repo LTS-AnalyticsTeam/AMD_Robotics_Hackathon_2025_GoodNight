@@ -202,7 +202,6 @@ def main() -> None:
     st.title("🤖 TEAM13_LTS Robotics_Team：GoodNight")
 
     st.subheader("📹 ライブビュー")
-    camera_status_placeholder = st.empty()
 
     webrtc_ctx = webrtc_streamer(
         key="camera-preview",
@@ -210,11 +209,6 @@ def main() -> None:
         video_processor_factory=CameraVideoProcessor,
         media_stream_constraints={"video": {"width": PREVIEW_WIDTH, "height": PREVIEW_HEIGHT}, "audio": False},
     )
-
-    if webrtc_ctx.state.playing:
-        camera_status_placeholder.success("プレビュー実行中")
-    else:
-        camera_status_placeholder.info("プレビューの初期化中です。")
 
     st.subheader("🎮 制御ボタン")
 
