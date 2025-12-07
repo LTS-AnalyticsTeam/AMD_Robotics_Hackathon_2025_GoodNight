@@ -39,7 +39,7 @@ By addressing these challenges, we explore how robots can perform delicate tasks
 - https://huggingface.co/collections/lt-s/amd-hackathon-2025
 ### Bi manual
 For Bi Manual operation, please refer to the following document.
-- `mission2/docs/bi_so101_bimanual.md`
+- [bi_so101_bimanual.md](mission2/docs/bi_so101_bimanual.md)
 
 ## Demo Video
 The following video shows a successful blanket-tucking action on a doll.
