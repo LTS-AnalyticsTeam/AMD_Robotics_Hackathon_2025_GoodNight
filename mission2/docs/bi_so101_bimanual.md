@@ -50,8 +50,8 @@ lerobot-record \
   --robot.right_arm_port=/dev/ttyACM3 \
   --robot.id=bi_so101_follower \
   --robot.cameras='{front: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30}, above: {"type": "opencv", "index_or_path": 6, "width": 640, "height": 480, "fps": 30, "fourcc":"MJPG", "warmup_s":2}}' \
-  --dataset.repo_id=lt-s/AMD_hackathon_place_blanket \
-  --dataset.single_task="Grab the red grip to unfold the blanket, then gently place the blanket over the doll." \
+  --dataset.repo_id=lt-s/AMD_hackathon_drape_blanket_2 \
+  --dataset.single_task="Lift the blanket from the doll's neck. Fold the blanket and place it gently next to the doll." \
   --dataset.num_episodes=50
 ```
 ### ブランケットをめくる
@@ -86,7 +86,7 @@ lerobot-record \
   --dataset.num_episodes=50 \
   --dataset.episode_time_s=50 \
   --dataset.push_to_hub=false \
-  --policy.path=lt-s/AMD_hackathon2025_blanket_smolvla_006000
+  --policy.path=lt-s/AMD_hackathon2025_blanket_smolvla_010000
 ```
 ### pi05
 ```bash
@@ -101,7 +101,22 @@ lerobot-record \
   --dataset.num_episodes=50 \
   --dataset.episode_time_s=50 \
   --dataset.push_to_hub=false \
-  --policy.path=lt-s/AMD_hackathon2025_blanket_pi05_006000
+  --policy.path=lt-s/AMD_hackathon2025_blanket_pi05_all_004000
+```
+### act
+```bash
+lerobot-record \
+  --robot.type=bi_so101_follower \
+  --robot.left_arm_port=/dev/ttyACM2 \
+  --robot.right_arm_port=/dev/ttyACM3 \
+  --robot.id=bi_so101_follower \
+  --robot.cameras='{front: {"type": "opencv", "index_or_path": 4, "width": 640, "height": 480, "fps": 30}, above: {"type": "opencv", "index_or_path": 6, "width": 640, "height": 480, "fps": 30, "fourcc":"MJPG", "warmup_s":2}}' \
+  --dataset.repo_id=lt-s/eval_AMD_hackathon_place_blanket \
+  --dataset.single_task="Grab the red grip to unfold the blanket, then gently place the blanket over the doll." \
+  --dataset.num_episodes=50 \
+  --dataset.episode_time_s=50 \
+  --dataset.push_to_hub=false \
+  --policy.path=lt-s/AMD_hackathon2025_blanket_act_fold_001600
 ```
 
 ## 安全メモ
