@@ -43,11 +43,5 @@ For Bi Manual operation, please refer to the following document.
 
 ## Demo Video
 The following video shows a successful blanket-tucking action on a doll.
-1. `/media/video/blanket-placement-success-1.mov`
-2. `/media/video/blanket-placement-success-2.mov`
-<video controls src="./media/video/blanket-placement-success-1.mov" width="640"></video>
-<video controls src="./media/video/blanket-placement-success-2.mov" width="640"></video>
-
-
 https://github.com/user-attachments/assets/530a4eb0-7ea9-46ab-bcbd-f9e5db75d51b
-
+[another videos](media/video)
