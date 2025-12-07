@@ -12,9 +12,9 @@ Todo:
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 import threading
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -24,14 +24,74 @@ import numpy as np
 import streamlit as st
 from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer
 
-sys.path.append(str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from act_inference_control import run_eval_inference
+
+# カメラ設定
 CAMERA_ID = 6
-# PREVIEW_WIDTH = 960
-# PREVIEW_HEIGHT = 720
 PREVIEW_WIDTH = 2180
 PREVIEW_HEIGHT = 1440
-INFERENCE_SCRIPT_PATH = Path(__file__).with_name("so-101_callAPI.py")
+
+
+@dataclass
+class RobotInferenceConfig:
+    """ロボット推論の設定を保持するデータクラス.
+
+    モデルごとに変更が必要なパラメータと、固定パラメータを管理する。
+
+    Attributes:
+        model_id (str): Hugging Face Hub上のモデルID。
+        meta_repo_id (str): メタデータリポジトリID。
+        task (str): タスクの説明文。
+        dataset_id (Optional[str]): 評価結果を保存するデータセットID（保存しない場合はNone）。
+        num_episodes (int): 実行するエピソード数。
+        fps (int): 制御および記録のFPS。
+        episode_time_s (int): 1エピソードの制御時間（秒）。
+        left_arm_port (str): 左腕フォロワーのシリアルポート。
+        right_arm_port (str): 右腕フォロワーのシリアルポート。
+        front_cam_index (int): 正面カメラのデバイスID。
+        above_cam_index (int): 上部カメラのデバイスID。
+        device (str): 使用デバイス（"cuda" または "cpu"）。
+        use_videos (bool): データセット保存時に動画を含めるかどうか。
+        image_writer_threads (int): 動画保存のスレッド数。
+        push_to_hub (bool): 実行終了時にHubへpushするかどうか。
+        save_dataset (bool): データセットを保存するかどうか。Falseの場合は推論のみ。
+
+    """
+
+    model_id: str
+    meta_repo_id: str
+    task: str
+    dataset_id: Optional[str] = None
+    num_episodes: int = 1
+    fps: int = 30
+    episode_time_s: int = 60
+    left_arm_port: str = "/dev/ttyACM2"
+    right_arm_port: str = "/dev/ttyACM3"
+    front_cam_index: int = 4
+    above_cam_index: int = 6
+    device: str = "cuda"
+    use_videos: bool = False
+    image_writer_threads: int = 4
+    push_to_hub: bool = False
+    save_dataset: bool = False
+
+
+### 各タスクのモデル設定
+# 布団をかけるタスクモデル
+DRAPE_BLANKET_CONFIG = RobotInferenceConfig(
+    model_id="lt-s/AMD_hackathon2025_blanket_act_drape_004000",
+    meta_repo_id="lt-s/AMD_hackathon_drape_blanket",
+    task="Grab the red grip to unfold the blanket, then gently place it.",
+)
+
+# 布団を外すタスクモデル
+REMOVE_BLANKET_CONFIG = RobotInferenceConfig(
+    model_id="lt-s/AMD_hackathon2025_blanket_act_fold_001600",
+    meta_repo_id="lt-s/AMD_hackathon_fold_blanket",
+    task="Lift the blanket from the doll's neck. Fold the blanket and place it gently next to the doll.",
+)
 
 
 def _open_capture(camera_id: int) -> cv2.VideoCapture:
@@ -105,38 +165,13 @@ def _init_session_state() -> None:
         st.session_state.inference_stop_event = None
     if "inference_running" not in st.session_state:
         st.session_state.inference_running = False
-    if "inference_module" not in st.session_state:
-        st.session_state.inference_module = None
-
-def _load_inference_module() -> object:
-    """so-101推論スクリプトを動的ロードする.
-
-    Returns:
-        object: `run_inference` 関数を含むモジュール。
-
-    Raises:
-        FileNotFoundError: スクリプトが存在しない場合に発生。
-        ImportError: モジュールのロードに失敗した場合に発生。
-
-    """
-
-    if st.session_state.inference_module is not None:
-        return st.session_state.inference_module
-
-    if not INFERENCE_SCRIPT_PATH.exists():
-        raise FileNotFoundError("推論スクリプトが見つかりません。")
-
-    spec = importlib.util.spec_from_file_location("so_101_callAPI", INFERENCE_SCRIPT_PATH)
-    if spec is None or spec.loader is None:
-        raise ImportError("推論スクリプトをロードできません。")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    st.session_state.inference_module = module
-    return module
 
 
-def _start_inference() -> None:
-    """布団掛けタスクの推論をバックグラウンドで開始する.
+def _start_inference(config: RobotInferenceConfig) -> None:
+    """指定された設定で推論をバックグラウンドで開始する.
+
+    Args:
+        config (RobotInferenceConfig): 推論設定。
 
     Returns:
         None: 返り値はない。
@@ -144,24 +179,41 @@ def _start_inference() -> None:
     """
 
     if st.session_state.inference_running:
-        return
-    try:
-        module = _load_inference_module()
-    except (ImportError, FileNotFoundError) as exc:
-        st.error(str(exc))
-        return
-
-    if not hasattr(module, "run_inference"):
-        st.error("推論スクリプトに run_inference が定義されていません。")
+        st.warning("既に推論が実行中です。")
         return
 
     stop_event = threading.Event()
 
+    def inference_wrapper():
+        """推論を実行し、停止イベントに対応するラッパー関数."""
+        try:
+            run_eval_inference(
+                model_id=config.model_id,
+                dataset_id=config.dataset_id,
+                task_description=config.task,
+                num_episodes=config.num_episodes,
+                fps=config.fps,
+                episode_time_s=config.episode_time_s,
+                left_arm_port=config.left_arm_port,
+                right_arm_port=config.right_arm_port,
+                front_cam_index=config.front_cam_index,
+                above_cam_index=config.above_cam_index,
+                device=config.device,
+                use_videos=config.use_videos,
+                image_writer_threads=config.image_writer_threads,
+                push_to_hub=config.push_to_hub,
+                save_dataset=config.save_dataset,
+                meta_repo_id=config.meta_repo_id,
+            )
+        except Exception as e:
+            st.error(f"推論中にエラーが発生しました: {e}")
+        finally:
+            st.session_state.inference_running = False
+
     inference_thread = threading.Thread(
-        target=module.run_inference,
-        kwargs={"stop_event": stop_event},
+        target=inference_wrapper,
         daemon=True,
-        name="so101-inference",
+        name="robot-inference",
     )
     st.session_state.inference_stop_event = stop_event
     st.session_state.inference_thread = inference_thread
@@ -212,14 +264,17 @@ def main() -> None:
 
     st.subheader("🎮 制御ボタン")
 
-    col_start, col_stop = st.columns(2)
-    with col_start:
-        if st.button("▶️ 布団掛け開始", key="inference_start", use_container_width=True):
-            _start_inference()
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("▶️ 布団掛け開始", key="drape_start", use_container_width=True):
+            _start_inference(DRAPE_BLANKET_CONFIG)
 
-    with col_stop:
-        if st.button("⏹️ 布団掛け停止", key="inference_stop", use_container_width=True):
-            _stop_inference()
+    with col2:
+        if st.button("🔄 布団外し開始", key="remove_start", use_container_width=True):
+            _start_inference(REMOVE_BLANKET_CONFIG)
+
+    if st.button("⏹️ 停止", key="inference_stop", use_container_width=True):
+        _stop_inference()
 
     inference_state = "実行中" if st.session_state.inference_running else "待機中"
     st.info(f"🤖 推論: {inference_state}")

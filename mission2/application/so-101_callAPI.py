@@ -11,13 +11,18 @@ Todo:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
 import threading
 from typing import Optional
 
-from mission2.src.robots import bi_so101_follower  # ← これを忘れずに
+# mission2ディレクトリをPythonパスに追加
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.robots import bi_so101_follower  # ← これを忘れずに
 from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig
 from lerobot.configs.policies import PreTrainedConfig
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata
 from lerobot.datasets.utils import build_dataset_frame
 from lerobot.policies.factory import make_policy, make_pre_post_processors
 from lerobot.policies.utils import make_robot_action
@@ -51,8 +56,13 @@ def run_inference(fps: int = 20, stop_event: Optional[threading.Event] = None) -
         right_arm_port="/dev/ttyACM3",
         id="bi_so101_follower",
         cameras={
-            "base_0_rgb": OpenCVCameraConfig(index_or_path=4, width=640, height=480, fps=30),
-            "left_wrist_0_rgb": OpenCVCameraConfig(
+            "front": OpenCVCameraConfig(
+                index_or_path=4,
+                width=640,
+                height=480,
+                fps=30,
+            ),
+            "above": OpenCVCameraConfig(
                 index_or_path=6,
                 width=640,
                 height=480,
@@ -64,20 +74,17 @@ def run_inference(fps: int = 20, stop_event: Optional[threading.Event] = None) -
     )
     robot = make_robot_from_config(robot_cfg)
 
-    # 2. データセットメタ情報
-    dataset = LeRobotDataset(
-        repo_id="lt-s/AMD_hackathon_drape_blanket",
-        download_videos=False,
-        batch_encoding_size=1,
-    )
+    # 2. ポリシー設定（同封メタを優先）
+    policy_cfg = PreTrainedConfig.from_pretrained("lt-s/AMD_hackathon2025_blanket_act_drape_slow_002400") ### モデル名を指定
+    meta_repo_id = policy_cfg.repo_id or "lt-s/AMD_hackathon_drape_blanket"
+    ds_meta = LeRobotDatasetMetadata(repo_id=meta_repo_id, force_cache_sync=False)
 
     # 3. ポリシーと前後処理
-    policy_cfg = PreTrainedConfig.from_pretrained("lt-s/AMD_hackathon2025_blanket_act_drape_slow_002400") ### モデル名を指定
-    policy = make_policy(policy_cfg, ds_meta=dataset.meta)
+    policy = make_policy(policy_cfg, ds_meta=ds_meta)
     preproc, postproc = make_pre_post_processors(
         policy_cfg=policy_cfg,
         pretrained_path=policy_cfg.pretrained_path,
-        dataset_stats=rename_stats(dataset.meta.stats, rename_map={}),
+        dataset_stats=rename_stats(ds_meta.stats, rename_map={}),
         preprocessor_overrides={"device_processor": {"device": policy_cfg.device}},
     )
 
@@ -92,7 +99,7 @@ def run_inference(fps: int = 20, stop_event: Optional[threading.Event] = None) -
             raw_obs = robot.get_observation()
             obs = robot_obs_proc(raw_obs)
             # obs_frame = build_dataset_frame(dataset.features, obs, prefix=obs/)
-            obs_frame = build_dataset_frame(dataset.features, obs, prefix=OBS_STR)
+            obs_frame = build_dataset_frame(ds_meta.features, obs, prefix=OBS_STR)
 
             action_values = predict_action(
                 observation=obs_frame,
@@ -101,10 +108,10 @@ def run_inference(fps: int = 20, stop_event: Optional[threading.Event] = None) -
                 preprocessor=preproc,
                 postprocessor=postproc,
                 use_amp=policy_cfg.use_amp,
-                task="Grab the red grip to unfold the blanket, then gently place the blanket over the doll.",
+                task="Lift the blanket by the red handle, unfold it, and then gently drape the blanket over the doll's neck.",
                 robot_type=robot.robot_type,
             )
-            robot_action = make_robot_action(action_values, dataset.features)
+            robot_action = make_robot_action(action_values, ds_meta.features)
             action_to_send = robot_action_proc((robot_action, obs))
             robot.send_action(action_to_send)
 
