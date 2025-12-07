@@ -34,13 +34,15 @@ Our work introduces several novel aspects:
 - A bi-manual coordination strategy using two SO-101 arms to lift, spread, and place a blanket with gentle and expressive motion  
 - A design concept emphasizing emotional support rather than pure task performance  
 - Motion profiles and policy tuning aimed at expressing softness, care, and non-intrusiveness  
-- A GUI-based interaction system that allows users to trigger high-level commands such as “Good night”, “Good morning”, and “Too warm”
+- A GUI-based interaction system that allows users to trigger high-level commands such as “Good night” and “Good morning”
 
 These components collectively highlight a new direction in home robotics: robots that feel emotionally considerate while remaining technically robust.
 
 ### 3. Technical Implementations
 
 #### Teleoperation / Dataset Capture
+To reliably manipulate a highly deformable blanket, we refined both the task setup and the way the arms are operated during teleoperation.  
+After grasping, we carefully adjusted lift direction, arm posture, and motion speed so that the blanket would not slip or fall, avoiding unnecessary tension or twisting of the material.
 We developed a custom bi-manual teleoperation environment where two SO-101 arms can be jointly controlled and recorded as a single synchronized dataset.  
 Through repeated practice and refinement, we collected nearly 500 high-quality episodes.  
 To improve data quality, we performed trimming, filtering, and refinement of teleoperation trajectories before training.
@@ -59,8 +61,7 @@ This setup allows:
 #### GUI Application
 We implemented an interactive GUI that enables high-level, user-friendly commands:
 - Good night – the robot gently places a blanket  
-- Good morning – the robot carefully pulls the blanket away  
-- Too warm – the blanket is lowered to the user's waist  
+- Good morning – the robot carefully pulls the blanket away
 This interface reduces operational complexity and enhances usability for non-expert users.
 
 ### 4. Ease of Use
