@@ -38,6 +38,7 @@ from lerobot.rl.wandb_utils import WandBLogger
 from lerobot.scripts.lerobot_eval import eval_policy_all
 from lerobot.utils.logging_utils import AverageMeter, MetricsTracker
 from lerobot.utils.random_utils import set_seed
+from lerobot.utils.tensorboard_utils import TensorBoardLogger
 from lerobot.utils.train_utils import (
     get_step_checkpoint_dir,
     get_step_identifier,
@@ -169,6 +170,7 @@ def train(cfg: TrainPipelineConfig, accelerator: Accelerator | None = None):
         wandb_logger = None
         if is_main_process:
             logging.info(colored("Logs will be saved locally.", "yellow", attrs=["bold"]))
+    tensorboard_logger = TensorBoardLogger(cfg) if cfg.tensorboard.enable and is_main_process else None
 
     if cfg.seed is not None:
         set_seed(cfg.seed, accelerator=accelerator)
@@ -357,6 +359,11 @@ def train(cfg: TrainPipelineConfig, accelerator: Accelerator | None = None):
                 if output_dict:
                     wandb_log_dict.update(output_dict)
                 wandb_logger.log_dict(wandb_log_dict, step)
+            if tensorboard_logger:
+                tb_log_dict = train_tracker.to_dict()
+                if output_dict:
+                    tb_log_dict.update(output_dict)
+                tensorboard_logger.log_dict(tb_log_dict, step)
             train_tracker.reset_averages()
 
         if cfg.save_checkpoint and is_saving_step:
@@ -425,6 +432,8 @@ def train(cfg: TrainPipelineConfig, accelerator: Accelerator | None = None):
                     wandb_log_dict = {**eval_tracker.to_dict(), **eval_info}
                     wandb_logger.log_dict(wandb_log_dict, step, mode="eval")
                     wandb_logger.log_video(eval_info["overall"]["video_paths"][0], step, mode="eval")
+                if tensorboard_logger:
+                    tensorboard_logger.log_dict(eval_tracker.to_dict(), step, mode="eval")
 
             accelerator.wait_for_everyone()
 
@@ -439,6 +448,8 @@ def train(cfg: TrainPipelineConfig, accelerator: Accelerator | None = None):
             unwrapped_policy.push_model_to_hub(cfg)
             preprocessor.push_to_hub(cfg.policy.repo_id)
             postprocessor.push_to_hub(cfg.policy.repo_id)
+        if tensorboard_logger:
+            tensorboard_logger.close()
 
     # Properly clean up the distributed process group
     accelerator.wait_for_everyone()
