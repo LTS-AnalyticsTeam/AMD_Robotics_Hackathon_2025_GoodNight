@@ -63,6 +63,7 @@ We implemented an interactive GUI that enables high-level, user-friendly command
 - Good night – the robot gently places a blanket  
 - Good morning – the robot carefully pulls the blanket away
 This interface reduces operational complexity and enhances usability for non-expert users.
+
 ![alt text](./media/img/app.jpg)
 
 ### 4. Ease of Use

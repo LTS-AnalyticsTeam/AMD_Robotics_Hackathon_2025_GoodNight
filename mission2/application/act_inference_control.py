@@ -19,6 +19,7 @@ import argparse
 import sys
 import warnings
 import time
+import threading
 from pathlib import Path
 from typing import Optional
 
@@ -78,6 +79,7 @@ def run_eval_inference(
     push_to_hub: bool,
     save_dataset: bool,
     meta_repo_id: Optional[str],
+    stop_event: Optional[threading.Event] = None,
 ) -> None:
     """ACTポリシーで推論しつつ評価エピソードを記録する、または推論のみ行う.
 
@@ -164,6 +166,11 @@ def run_eval_inference(
 
     try:
         for episode_idx in range(num_episodes):
+            # 停止イベントのチェック
+            if stop_event is not None and stop_event.is_set():
+                log_say("停止イベントを検知しました。推論を中断します。")
+                break
+            
             log_say(
                 f"{'Recording' if save_dataset else 'Running'} inference episode {episode_idx + 1} of {num_episodes}"
             )
@@ -187,6 +194,11 @@ def run_eval_inference(
             else:
                 start_t = time.perf_counter()
                 while time.perf_counter() - start_t < episode_time_s:
+                    # 停止イベントのチェック
+                    if stop_event is not None and stop_event.is_set():
+                        log_say("停止イベントを検知しました。推論を中断します。")
+                        break
+                    
                     obs_raw = robot.get_observation()
                     obs_proc = robot_obs_proc(obs_raw)
                     obs_frame = build_dataset_frame(dataset_features, obs_proc, prefix=OBS_STR)
